@@ -5,6 +5,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -19,7 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		//formatter:off
 		http
-				.addFilterBefore(usernamePasswordAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(usernamePasswordAuthenticationCustomFilterFilter(), UsernamePasswordAuthenticationFilter.class )
 				.csrf()
 				.ignoringAntMatchers("/h2-console/**")
 				.and()
@@ -29,8 +30,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 				.authorizeRequests()
 				.anyRequest().authenticated()
-				.and()
-				.exceptionHandling().authenticationEntryPoint(new AppAuthenticationEntryPoint("/login"))
 				.and()
 				.formLogin()
 				.loginPage("/login")
@@ -48,12 +47,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.roles("USER");
 	}
 
-	@Bean
-	public UsernamePasswordAuthFilter usernamePasswordAuthFilter() throws Exception {
-		UsernamePasswordAuthFilter filter = new UsernamePasswordAuthFilter();
+	public UsernamePasswordAuthenticationCustomFilter usernamePasswordAuthenticationCustomFilterFilter() throws Exception {
+		UsernamePasswordAuthenticationCustomFilter filter = new UsernamePasswordAuthenticationCustomFilter();
 		filter.setAuthenticationManager(authenticationManagerBean());
+		filter.setAuthenticationFailureHandler(failureHandler());
 		return filter;
+	}
 
+	@Bean
+	public SimpleUrlAuthenticationFailureHandler failureHandler() {
+		return new SimpleUrlAuthenticationFailureHandler("/login?error");
 	}
 
 }

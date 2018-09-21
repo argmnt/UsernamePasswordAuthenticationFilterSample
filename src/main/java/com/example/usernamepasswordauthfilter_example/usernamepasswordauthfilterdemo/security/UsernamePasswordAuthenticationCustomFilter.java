@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 
 @Slf4j
-public class UsernamePasswordAuthFilter extends UsernamePasswordAuthenticationFilter {
+public class UsernamePasswordAuthenticationCustomFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
